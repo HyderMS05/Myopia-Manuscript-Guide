@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Myopia Research Manuscript Hub</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-blue: #2563eb;
+            --primary-blue-light: #3b82f6;
+            --primary-blue-dark: #1d4ed8;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --accent-red: #ef4444;
+            --gray-light: #f8fafc;
+            --gray-medium: #64748b;
+            --gray-dark: #1e293b;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        
+        .main-container {
+            background: white;
+            margin: 2rem auto;
+            max-width: 1200px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><path d="M0,50 C150,20 300,80 500,50 C700,20 850,80 1000,50 L1000,100 L0,100 Z"/></svg>');
+            background-size: cover;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .title-main {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-green));
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-description {
+            color: var(--gray-medium);
+            font-size: 0.9rem;
+        }
+        
+        .tab-navigation {
+            display: flex;
+            justify-content: center;
+            margin: 3rem 0;
+            padding: 0 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .tab-button {
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background: #f1f5f9;
+            color: var(--gray-medium);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+            color: white;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+        
+        .tab-button:hover:not(.active) {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 2rem;
+            margin: 0 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .flowchart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .flowchart-node {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            border: 2px solid var(--primary-blue-light);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
+            max-width: 400px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .flowchart-node:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(59, 130, 246, 0.25);
+        }
+        
+        .flowchart-node::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 20px solid var(--primary-blue-light);
+        }
+        
+        .flowchart-node:last-child::after {
+            display: none;
+        }
+        
+        .chart-container {
+            height: 400px;
+            margin: 2rem 0;
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .data-table th {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            text-align: left;
+        }
+        
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .data-table tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+        
+        .data-table tbody tr:hover {
+            background: #f1f5f9;
+        }
+        
+        .p-value {
+            font-weight: 700;
+            color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.25rem 0.5rem;
+            border-radius: 6px;
+        }
+        
+        .p-value.ns {
+            color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid var(--accent-yellow);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .highlight-box h4 {
+            color: #92400e;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .highlight-box p {
+            color: #a16207;
+        }
+        
+        .insight-box {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        
+        .insight-box h4 {
+            color: #065f46;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .insight-box p {
+            color: #047857;
+        }
+        
+        .footer-section {
+            background: linear-gradient(135deg, var(--gray-dark), #475569);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        .icon-decoration {
+            font-size: 4rem;
+            color: var(--primary-blue-light);
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+        
+        @media (max-width: 768px) {
+            .title-main {
+                font-size: 2.5rem;
+            }
+            
+            .stat-number {
+                font-size: 2.5rem;
+            }
+            
+            .tab-navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .main-container {
+                margin: 1rem;
+                border-radius: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Enhanced Header -->
+        <header class="header-section">
+            <div class="header-content">
+                <i class="fas fa-eye icon-decoration"></i>
+                <h1 class="title-main">Myopia in Medical Students</h1>
+                <p class="text-xl opacity-90 font-medium">A Comprehensive Research Manuscript Hub</p>
+                <p class="mt-4 max-w-3xl mx-auto text-blue-100">
+                    This comprehensive dashboard presents our research findings on myopia prevalence among medical students, 
+                    featuring interactive visualizations, detailed analysis, and manuscript drafting guidelines.
+                </p>
+            </div>
+        </header>
+
+        <!-- Enhanced Key Findings Dashboard -->
+        <section class="py-8">
+            <h2 class="section-title">Key Research Findings</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-8">
+                <div class="stat-card">
+                    <i class="fas fa-chart-pie text-4xl text-blue-500 mb-4"></i>
+                    <p class="stat-number">67.2%</p>
+                    <p class="stat-label">Myopia Prevalence</p>
+                    <p class="stat-description">Students in our sample diagnosed with myopia</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-shield-alt text-4xl text-green-500 mb-4"></i>
+                    <p class="stat-number">29%</p>
+                    <p class="stat-label">Risk Reduction</p>
+                    <p class="stat-description">Decrease in myopia odds with regular digital breaks</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-dna text-4xl text-yellow-500 mb-4"></i>
+                    <p class="stat-number">p=.005</p>
+                    <p class="stat-label">Hereditary Factor</p>
+                    <p class="stat-description">Statistical significance of family history link</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                    <p class="stat-number">89% vs 22%</p>
+                    <p class="stat-label">Knowledge Gap</p>
+                    <p class="stat-description">Awareness versus actual preventive practice</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Enhanced Navigation -->
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="openTab(event, 'flowchart')">
+                <i class="fas fa-project-diagram"></i>
+                Analysis Flow
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'visuals')">
+                <i class="fas fa-chart-bar"></i>
+                Visualizations
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'methodology')">
+                <i class="fas fa-flask"></i>
+                Methodology
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'results')">
+                <i class="fas fa-table"></i>
+                Results
+            </button>
+            <button class="tab-button" onclick="openTab(event, 'discussion')">
+                <i class="fas fa-comments"></i>
+                Discussion
+            </button>
+        </div>
+
+        <!-- Enhanced Tab Content -->
+        <div id="flowchart" class="tab-content active">
+            <h3 class="section-title">Research Analysis Workflow</h3>
+            <div class="flowchart-container">
+                <div class="flowchart-node">
+                    <i class="fas fa-chart-line text-3xl text-blue-500 mb-2"></i>
+                    <h4 class="text-xl font-bold text-blue-700">1. Descriptive Analysis</h4>
+                    <p class="text-gray-600">Comprehensive examination of prevalence rates, demographic patterns, and awareness levels</p>
+                </div>
+                <div class="flowchart-node">
+                    <i class="fas fa-search text-3xl text-green-500 mb-2"></i>
+                    <h4 class="text-xl font-bold text-green-700">2. Bivariate Analysis</h4>
+                    <p class="text-gray-600">Chi-Square tests and T-tests to identify potential risk factors and associations</p>
+                </div>
+                <div class="flowchart-node">
+                    <i class="fas fa-calculator text-3xl text-purple-500 mb-2"></i>
+                    <h4 class="text-xl font-bold text-purple-700">3. Multivariable Logistic Regression</h4>
+                    <p class="text-gray-600">Advanced modeling to identify the strongest predictors for myopia presence</p>
+                </div>
+                <div class="flowchart-node">
+                    <i class="fas fa-microscope text-3xl text-red-500 mb-2"></i>
+                    <h4 class="text-xl font-bold text-red-700">4. Multiple Linear Regression</h4>
+                    <p class="text-gray-600">Sub-analysis focusing on severity predictors among myopic students</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="visuals" class="tab-content">
+            <h3 class="section-title">Interactive Data Visualizations</h3>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-center text-gray-700">
+                        <i class="fas fa-eye mr-2"></i>Myopia Prevalence Distribution
+                    </h4>
+                    <div class="chart-container">
+                        <canvas id="prevalenceChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-center text-gray-700">
+                        <i class="fas fa-users mr-2"></i>Age Group Distribution
+                    </h4>
+                    <div class="chart-container">
+                        <canvas id="ageChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-center text-gray-700">
+                        <i class="fas fa-graduation-cap mr-2"></i>Distribution by Academic Year
+                    </h4>
+                    <div class="chart-container">
+                        <canvas id="yearChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4 text-center text-gray-700">
+                        <i class="fas fa-brain mr-2"></i>Knowledge vs. Practice Gap
+                    </h4>
+                    <div class="chart-container">
+                        <canvas id="gapChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="methodology" class="tab-content">
+            <h3 class="section-title">Statistical Methodology</h3>
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-16 border-l-4 border-blue-500">
+                <h4 class="text-lg font-bold text-blue-700 mb-4">
+                    <i class="fas fa-cogs mr-2"></i>Official Methodology Statement
+                </h4>
+                <div class="prose prose-lg">
+                    <p class="text-gray-700 leading-relaxed">
+                        "All collected data was coded and analyzed using SPSS (Version 28). Descriptive statistics, including frequencies and percentages for categorical data, along with means and standard deviations for scale data, were used to summarize the sample characteristics and determine the prevalence of myopia. The association between categorical risk factors and myopia was assessed using the Chi-Square Test of Independence. An Independent-Samples T-Test was used to compare the mean number of myopic siblings between the myopic and non-myopic groups. To identify the most significant predictors for the presence of myopia, a multivariable binary logistic regression was performed. Finally, to explore factors associated with the degree of myopia, a multiple linear regression was conducted on myopic students only. A p-value of < 0.05 was considered statistically significant for all inferential tests."
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div id="results" class="tab-content">
+            <h3 class="section-title">Research Results & Data Tables</h3>
+            
+            <div class="mb-8">
+                <h4 class="text-xl font-semibold mb-4 text-gray-700">
+                    <i class="fas fa-table mr-2"></i>Table 1: Demographic & Clinical Characteristics
+                </h4>
+                <p class="mb-4 text-gray-600">Comprehensive summary of sample characteristics and bivariate analysis results</p>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Characteristic</th>
+                                <th>Category</th>
+                                <th>Overall (N=204)</th>
+                                <th>Non-Myopic (N=67)</th>
+                                <th>Myopic (N=137)</th>
+                                <th>p-value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2" class="font-semibold">Gender</td>
+                                <td>Male</td>
+                                <td>56 (27.5%)</td>
+                                <td>18 (26.9%)</td>
+                                <td>38 (27.7%)</td>
+                                <td rowspan="2" class="p-value ns">0.915</td>
+                            </tr>
+                            <tr>
+                                <td>Female</td>
+                                <td>148 (72.5%)</td>
+                                <td>49 (73.1%)</td>
+                                <td>99 (72.3%)</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Break Frequency (Digital)</td>
+                                <td>Categorical</td>
+                                <td>Variable</td>
+                                <td>Higher frequency</td>
+                                <td>Lower frequency</td>
+                                <td class="p-value">0.027</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Number of Myopic Siblings</td>
+                                <td>Mean ± SD</td>
+                                <td>1.14 ± 1.2</td>
+                                <td>0.83 ± 0.9</td>
+                                <td>1.29 ± 1.3</td>
+                                <td class="p-value">0.005</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h4 class="text-xl font-semibold mb-4 text-gray-700">
+                    <i class="fas fa-chart-line mr-2"></i>Table 2: Logistic Regression - Myopia Predictors
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>Adjusted Odds Ratio (aOR)</th>
+                                <th>95% Confidence Interval</th>
+                                <th>p-value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-semibold">Break Frequency (Digital)</td>
+                                <td>0.706</td>
+                                <td>0.509 - 0.980</td>
+                                <td class="p-value">0.037</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Number of Myopic Siblings</td>
+                                <td>1.302</td>
+                                <td>0.993 - 1.707</td>
+                                <td class="p-value ns">0.056</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h4 class="text-xl font-semibold mb-4 text-gray-700">
+                    <i class="fas fa-microscope mr-2"></i>Table 3: Linear Regression - Severity Predictors
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Variable</th>
+                                <th>B Coefficient</th>
+                                <th>Standard Error</th>
+                                <th>p-value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="font-semibold">Weekday Reading Hours (Paper)</td>
+                                <td>0.423</td>
+                                <td>0.112</td>
+                                <td class="p-value">< 0.001</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Break Frequency (Digital)</td>
+                                <td>-0.311</td>
+                                <td>0.142</td>
+                                <td class="p-value">0.029</td>
+                            </tr>
+                            <tr>
+                                <td class="font-semibold">Number of Myopic Siblings</td>
+                                <td>0.307</td>
+                                <td>0.089</td>
+                                <td class="p-value">0.001</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="discussion" class="tab-content">
+            <h3 class="section-title">Discussion Guidelines & Key Points</h3>
+            <div class="space-y-6">
+                <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-6 rounded-12 border-l-4 border-blue-500">
+                    <h4 class="text-lg font-bold text-blue-700 mb-2">
+                        <i class="fas fa-chart-pie mr-2"></i>1. Contextualize High Prevalence
+                    </h4>
+                    <p class="text-blue-600">Begin by discussing our primary finding of 67.2% myopia prevalence. Compare this with existing literature on medical students globally to establish the significance and importance of our research contribution.</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-green-50 to-green-100 p-6 rounded-12 border-l-4 border-green-500">
+                    <h4 class="text-lg font-bold text-green-700 mb-2">
+                        <i class="fas fa-shield-alt mr-2"></i>2. Highlight Protective Factors
+                    </h4>
+                    <p class="text-green-600">Emphasize that taking regular digital breaks represents our most robust protective finding. This modifiable behavior should be positioned as a primary target for evidence-based interventions.</p>
+                </div>
+                
+                <div class="highlight-box">
+                    <h4><i class="fas fa-exclamation-triangle mr-2"></i>3. The Critical Knowledge-Practice Gap</h4>
+                    <p>This represents our most significant finding: "While nearly 90% of students demonstrated awareness of eye health measures, only 22% consistently implemented these practices. This substantial gap suggests that knowledge alone is insufficient to drive preventative behaviors, highlighting the need for targeted behavioral interventions."</p>
+                </div>
+                
+                <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-12 border-l-4 border-red-500">
+                    <h4 class="text-lg font-bold text-red-700 mb-2">
+                        <i class="fas fa-exclamation-circle mr-2"></i>4. Address Study Limitations
+                    </h4>
+                    <p class="text-red-600">Maintain transparency by acknowledging key limitations: cross-sectional design preventing causal inference, potential recall bias from self-reported data, and single-institution scope limiting generalizability.</p>
+                </div>
+                
+                <div class="insight-box">
+                    <h4><i class="fas fa-lightbulb mr-2"></i>5. Strong Conclusions & Future Directions</h4>
+                    <p>Conclude with actionable recommendations: interventions should prioritize behavioral change strategies over simple education, including structured break reminders, wellness campaigns, and systematic approaches to help students translate knowledge into consistent practice.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Footer -->
+        <footer class="footer-section">
+            <div class="text-center">
+                <i class="fas fa-user-md text-4xl mb-4 opacity-70"></i>
+                <p class="text-xl font-semibold mb-2">Mirza Shaheer Hyder</p>
+                <p class="text-blue-200">Principal Investigator</p>
+                <p class="text-sm text-gray-300 mt-4">
+                    <i class="fas fa-calendar-check mr-2"></i>
+                    Data Analysis Completed: July 11, 2025
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Chart.js configurations
+        const chartDefaults = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 12,
+                            family: 'Inter'
+                        }
+                    }
+                }
+            }
+        };
+
+        // Initialize charts when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevalence Chart
+            const prevalenceCtx = document.getElementById('prevalenceChart').getContext('2d');
+            new Chart(prevalenceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Myopic', 'Non-Myopic'],
+                    datasets: [{
+                        data: [67.2, 32.8],
+                        backgroundColor: ['#3b82f6', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    ...chartDefaults,
+                    plugins: {
+                        ...chartDefaults.plugins,
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Age Chart
+            const ageCtx = document.getElementById('ageChart').getContext('2d');
+            new Chart(ageCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['18-20 years', '21-23 years', '24-26 years'],
+                    datasets: [{
+                        label: 'Percentage',
+                        data: [35.5, 61.6, 2.9],
+                        backgroundColor: ['#f59e0b', '#3b82f6', '#ef4444'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    ...chartDefaults,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 70,
+                            title: {
+                                display: true,
+                                text: 'Percentage (%)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Year Chart
+            const yearCtx = document.getElementById('yearChart').getContext('2d');
+            new Chart(yearCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year'],
+                    datasets: [{
+                        label: 'Percentage',
+                        data: [10.8, 29.1, 15.8, 32.0, 12.3],
+                        backgroundColor: ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    ...chartDefaults,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 35,
+                            title: {
+                                display: true,
+                                text: 'Percentage (%)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gap Chart
+            const gapCtx = document.getElementById('gapChart').getContext('2d');
+            new Chart(gapCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Awareness', 'Regular Practice'],
+                    datasets: [{
+                        label: 'Percentage',
+                        data: [88.7, 22.1],
+                        backgroundColor: ['#10b981', '#ef4444'],
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    ...chartDefaults,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Percentage (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // Tab functionality
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
+</body>
+</html>
